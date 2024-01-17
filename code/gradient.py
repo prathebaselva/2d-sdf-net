@@ -13,13 +13,11 @@ def getGradient(predicted_sdf, batch_sample_sampled_points):
     gradient_predicted_sdf, = torch.autograd.grad(outputs=predicted_sdf, inputs=[batch_sample_sampled_points], grad_outputs=batch_gradient_outputs, retain_graph=True, create_graph=True)    
     return gradient_predicted_sdf
 
-def getHessian(model, batch_sample_sampled_points):
+def getHessian(model, batch_sample_sampled_points, matrixsize=3):
     bs = batch_sample_sampled_points.shape[0]
-    hess = torch.zeros(bs, 3,3)
+    hess = torch.zeros(bs, matrixsize,matrixsize)
     for i in range(bs):
         hess[i] = torch.autograd.functional.hessian(model, batch_sample_sampled_points[i])
-        if i == 0 or i == bs-1:
-            print(hess[i])
     return hess
 
 def getGradientAndHessian(predicted_sdf, batch_sample_sampled_points):
