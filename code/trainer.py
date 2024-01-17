@@ -9,6 +9,7 @@ from net import SDFNet
 from loader import SDFData
 from renderer import plot_sdf
 from gradient import getGradient, getGradientAndHessian
+from loss import implicit_loss_2d
 
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
             if t > 500:
                 predicted_gradient, pred_hess_matrix = getGradientAndHessian(pred_sdf, xy, matrixsize=2)
-                hessloss = implicit_loss(predicted_gradient, pred_hess_matrix, self.args, self.device)
+                hessloss = implicit_loss_2d(predicted_gradient, pred_hess_matrix, device)
                 loss += hessloss
             loss.backward()
             optimizer.step()
