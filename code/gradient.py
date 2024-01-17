@@ -20,18 +20,18 @@ def getHessian(model, batch_sample_sampled_points, matrixsize=3):
         hess[i] = torch.autograd.functional.hessian(model, batch_sample_sampled_points[i])
     return hess
 
-def getGradientAndHessian(predicted_sdf, batch_sample_sampled_points):
+def getGradientAndHessian(predicted_sdf, batch_sample_sampled_points, matrixsize=2):
     batch_gradient_outputs = torch.ones_like(predicted_sdf).to(device) 
     gradient_predicted_sdf, = torch.autograd.grad(outputs=predicted_sdf, inputs=[batch_sample_sampled_points], grad_outputs=batch_gradient_outputs, retain_graph=True, create_graph=True)    
     
-    hessian_matrix = calculateGradient(gradient_predicted_sdf, batch_sample_sampled_points, True)
+    hessian_matrix = calculateGradient(gradient_predicted_sdf, batch_sample_sampled_points, True, matrixsize)
     return gradient_predicted_sdf, hessian_matrix
 
 
-def calculateGradient(outputs, inputs,create_graph=False):
+def calculateGradient(outputs, inputs,create_graph=False, matrixsize=2):
     jac = []
     transpose_outputs = outputs.transpose(1,0)
-    for i in range(3):
+    for i in range(martixsize):
         if transpose_outputs.shape[1] <= 1:
             batch_gradient_outputs = torch.ones(transpose_outputs[i].size()).to(device) 
         else:
