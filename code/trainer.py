@@ -8,6 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 from net import SDFNet
 from loader import SDFData
 from renderer import plot_sdf
+from gradient import getGradient, getGradientAndHessian
 
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
@@ -58,7 +59,10 @@ if __name__ == '__main__':
             pred_sdf = model(xy)
             sdf = torch.reshape(sdf, pred_sdf.shape)
             loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
-
+            if t > 500:
+                predicted_gradient, pred_hess_matrix = getGradientAndHessian(pred_sdf, xy, matrixsize=2)
+                hessloss = implicit_loss(predicted_gradient, pred_hess_matrix, self.args, self.device)
+                loss += hessloss
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
