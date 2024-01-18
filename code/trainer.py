@@ -60,6 +60,7 @@ if __name__ == '__main__':
             pred_sdf = model(xy)
             sdf = torch.reshape(sdf, pred_sdf.shape)
             loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
+            # Once epoch reaches 1000 and 1200, considering 1200 is the maxepoch, render the image.
             if t > 500:
                 predicted_gradient, pred_hess_matrix = getGradientAndHessian(pred_sdf, xy, matrixsize=2)
                 hessloss = implicit_loss_2d(predicted_gradient, pred_hess_matrix, device)
