@@ -57,6 +57,7 @@ if __name__ == '__main__':
         size = len(train_dataloader.dataset)
         for batch, (xy, sdf) in enumerate(train_dataloader):
             xy, sdf = xy.to(device), sdf.to(device)
+            xy.requires_grad = True
             pred_sdf = model(xy)
             sdf = torch.reshape(sdf, pred_sdf.shape)
             loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
